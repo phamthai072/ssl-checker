@@ -23,13 +23,15 @@ function getHostname(input) {
 app.get("/check", async (req, res) => {
   const host = req.query.host;
   if (!host) {
-    return res.status(400).json({ error: "Missing host param" });
+    return res
+      .status(400)
+      .json({ error: "Missing host param", success: false });
   }
 
   // validate host
   const hostname = getHostname(host);
   if (!hostname) {
-    return res.status(400).json({ error: "Invalid host" });
+    return res.status(400).json({ error: "Invalid host", success: false });
   }
 
   let server_info = {
@@ -80,6 +82,7 @@ app.get("/check", async (req, res) => {
         responsesSent = true;
 
         res.json({
+          success: true,
           hostname,
           issuer: cert.issuer,
           subject: cert.subject,
@@ -97,17 +100,19 @@ app.get("/check", async (req, res) => {
       if (responsesSent) return;
       responsesSent = true;
       socket.destroy();
-      res.status(500).json({ error: "Connection timeout", server_info });
+      res
+        .status(500)
+        .json({ error: "Connection timeout", server_info, success: false });
     });
 
     socket.on("error", (err) => {
       if (responsesSent) return;
       responsesSent = true;
       socket.destroy();
-      res.status(500).json({ error: err.message, server_info });
+      res.status(500).json({ error: err.message, server_info, success: false });
     });
   } catch (err) {
-    res.status(500).json({ error: err.message, server_info });
+    res.status(500).json({ error: err.message, server_info, success: false });
   }
 });
 
