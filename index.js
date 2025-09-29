@@ -48,6 +48,10 @@ app.get("/check", async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("SSL Check API. Use /check?host=example.com to check SSL certificate.");
+});
+
 app.listen(PORT, () => {
   console.log(`SSL check API running at http://localhost:${PORT}`);
 });
