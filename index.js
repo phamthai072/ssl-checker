@@ -1,5 +1,6 @@
 const express = require("express");
 const tls = require("tls");
+const constants = require("constants");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,7 +16,13 @@ app.get("/check", async (req, res) => {
     const socket = tls.connect(
       443,
       host,
-      { servername: host },
+      {
+        servername: host,
+        secureOptions:
+          constants.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION |
+          constants.SSL_OP_LEGACY_SERVER_CONNECT,
+        minDHSize: 0,
+      },
       () => {
         const cert = socket.getPeerCertificate();
         socket.end();
@@ -49,7 +56,9 @@ app.get("/check", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("SSL Check API. Use /check?host=example.com to check SSL certificate.");
+  res.send(
+    "SSL Check API. Use /check?host=example.com to check SSL certificate."
+  );
 });
 
 app.listen(PORT, () => {
