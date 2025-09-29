@@ -33,6 +33,10 @@ app.get("/check", async (req, res) => {
       DEFAULT_MIN_VERSION: tls["DEFAULT_MIN_VERSION"],
       DEFAULT_MAX_VERSION: tls["DEFAULT_MAX_VERSION"],
     },
+    node: {
+      version: process.version,
+      platform: process.platform,
+    },
   };
 
   try {
