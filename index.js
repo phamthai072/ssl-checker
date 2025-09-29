@@ -24,6 +24,17 @@ app.get("/check", async (req, res) => {
   // remove trailing slash
   host = host.replace(/\/.*/, "");
 
+  let server_info = {
+    tls: {
+      CLIENT_RENEG_LIMIT: tls["CLIENT_RENEG_LIMIT"],
+      CLIENT_RENEG_WINDOW: tls["CLIENT_RENEG_WINDOW"],
+      DEFAULT_CIPHERS: tls["DEFAULT_CIPHERS"],
+      DEFAULT_ECDH_CURVE: tls["DEFAULT_ECDH_CURVE"],
+      DEFAULT_MIN_VERSION: tls["DEFAULT_MIN_VERSION"],
+      DEFAULT_MAX_VERSION: tls["DEFAULT_MAX_VERSION"],
+    },
+  };
+
   try {
     const socket = tls.connect(
       443,
@@ -54,15 +65,16 @@ app.get("/check", async (req, res) => {
           days_remaining: Math.round(
             (expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
           ),
+          server_info,
         });
       }
     );
 
     socket.on("error", (err) => {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message, server_info });
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, server_info });
   }
 });
 
