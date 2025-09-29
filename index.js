@@ -5,24 +5,32 @@ const constants = require("constants");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const hostRegex =
-  /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/;
+function getHostname(input) {
+  try {
+    let url = input;
+    if (!/^https?:\/\//i.test(input)) {
+      url = "https://" + input;
+    }
+
+    const parsed = new URL(url);
+    return parsed.hostname;
+  } catch (e) {
+    return null;
+  }
+}
 
 // Endpoint: /check?host=example.com
 app.get("/check", async (req, res) => {
-  let host = req.query.host;
+  const host = req.query.host;
   if (!host) {
     return res.status(400).json({ error: "Missing host param" });
   }
 
   // validate host
-  if (!hostRegex.test(host)) {
+  const hostname = getHostname(host);
+  if (!hostname) {
     return res.status(400).json({ error: "Invalid host" });
   }
-  // remove http/https
-  host = host.replace(/https?:\/\//, "");
-  // remove trailing slash
-  host = host.replace(/\/.*/, "");
 
   let server_info = {
     tls: {
@@ -36,32 +44,43 @@ app.get("/check", async (req, res) => {
     node: {
       version: process.version,
       platform: process.platform,
+      arch: process.arch,
+      openssl: process.versions.openssl,
     },
   };
 
   try {
+    let responsesSent = false;
+
     const socket = tls.connect(
       443,
-      host,
+      hostname,
       {
-        servername: host,
+        servername: hostname,
         secureOptions:
           constants.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION |
           constants.SSL_OP_LEGACY_SERVER_CONNECT,
         minDHSize: 1,
+        timeout: 10000, // 10 giây timeout
       },
       () => {
+        if (responsesSent) return;
+
         const cert = socket.getPeerCertificate();
-        socket.end();
+        socket.destroy(); // Cleanup socket
 
         if (!cert || !cert.valid_to) {
-          return res.status(500).json({ error: "Cannot get certificate info" });
+          responsesSent = true;
+          return res
+            .status(500)
+            .json({ error: "Cannot get certificate info", server_info });
         }
 
         const expiryDate = new Date(cert.valid_to);
+        responsesSent = true;
 
         res.json({
-          host,
+          hostname,
           issuer: cert.issuer,
           subject: cert.subject,
           valid_from: cert.valid_from,
@@ -74,7 +93,17 @@ app.get("/check", async (req, res) => {
       }
     );
 
+    socket.on("timeout", () => {
+      if (responsesSent) return;
+      responsesSent = true;
+      socket.destroy();
+      res.status(500).json({ error: "Connection timeout", server_info });
+    });
+
     socket.on("error", (err) => {
+      if (responsesSent) return;
+      responsesSent = true;
+      socket.destroy();
       res.status(500).json({ error: err.message, server_info });
     });
   } catch (err) {
