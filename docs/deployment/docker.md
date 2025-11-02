@@ -61,12 +61,12 @@ NODE_VERSION=18
 
 ### Available Configuration Options
 
-| Variable      | Description                          | Default |
-| ------------- | ------------------------------------ | ------- |
-| `PORT`        | Container internal port              | `3000`  |
-| `HOST_PORT`   | Host machine port to map to          | `3000`  |
-| `NODE_ENV`    | Node.js environment mode             | `production` |
-| `NODE_VERSION`| Node.js version for Docker build     | `18`    |
+| Variable       | Description                          | Default      |
+| -------------- | ------------------------------------ | ------------ |
+| `PORT`         | Container internal port              | `3000`       |
+| `HOST_PORT`    | Host machine port to map to          | `3000`       |
+| `NODE_ENV`     | Node.js environment mode             | `production` |
+| `NODE_VERSION` | Node.js version for Docker build     | `18`         |
 
 ### Custom Port Example
 

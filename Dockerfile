@@ -1,5 +1,6 @@
 # Use Node.js LTS (Long Term Support) version
-FROM node:18-alpine
+# Using a specific version for reproducible builds
+FROM node:18.20.5-alpine
 
 # Set working directory
 WORKDIR /app
