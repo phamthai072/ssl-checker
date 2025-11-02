@@ -194,8 +194,6 @@ docker inspect --format='{{json .State.Health}}' ssl-checker
 
 ```yaml
 # docker-compose.prod.yml
-version: '3.8'
-
 services:
   ssl-checker:
     build: .
@@ -274,8 +272,6 @@ curl "http://localhost:3000/check?host=google.com"
 ### Using Custom Network
 
 ```yaml
-version: '3.8'
-
 services:
   ssl-checker:
     build: .
@@ -292,8 +288,6 @@ networks:
 ### Volume Mounting for Development
 
 ```yaml
-version: '3.8'
-
 services:
   ssl-checker:
     build: .
