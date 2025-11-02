@@ -14,7 +14,8 @@ A simple and efficient web application to check SSL certificates of websites wit
 - 📊 Detailed certificate information including expiry dates
 - 🔧 Server and TLS configuration details
 - ⚡ Fast and lightweight
-- 🌍 Ready for deployment on Vercel, Railway, and other platforms
+- 🐳 Docker support with custom configuration
+- 🌍 Ready for deployment on Vercel, Railway, Docker, and other platforms
 
 ## 🚀 Quick Start
 
@@ -60,8 +61,7 @@ Open your browser and go to `http://localhost:3000`
 
 - **Backend**: Node.js, Express.js
 - **Frontend**: HTML, CSS, JavaScript
-- **Deployment**: Vercel, Railway ready
-
+- **Deployment**: Docker, Vercel, Railway ready
 - **Security**: TLS/SSL certificate validation
 
 ## 📖 Example Usage
@@ -101,10 +101,24 @@ curl "http://localhost:3000/check?host=google.com"
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/ssl-checker)
 
+### Docker Deployment
+
+```bash
+# Using Docker Compose
+docker-compose up -d
+
+# Using Docker directly
+docker build -t ssl-checker .
+docker run -p 3000:3000 ssl-checker
+```
+
+See the [Docker Deployment Guide](./docs/deployment/docker.md) for detailed instructions and custom configuration.
+
 ### Manual Deployment
 
 See our deployment guides for detailed instructions:
 
+- [🐳 Deploy with Docker](./docs/deployment/docker.md) - Deploy using Docker with custom configuration
 - [Deploy to Vercel](./docs/deployment/vercel.md)
 - [Deploy to Railway](./docs/deployment/railway.md)
 
